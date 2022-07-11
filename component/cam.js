@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, Dimensions,Image } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import * as FaceDetector from 'expo-face-detector';
+import * as MediaLibrary from 'expo-media-library';
+
+
+
+
 
 export default function Cam() {
   const [hasPermission, setHasPermission] = useState(null);
@@ -14,7 +19,13 @@ export default function Cam() {
   const [nose,setNose]= useState({x:0,y:0})
   const [lapin,setLapin]= useState({width:0,height:0,x:0,y:0})
   const [image, setImage] = useState(null);
+  const [media,setMedia] = useState(MediaLibrary)
 
+  
+
+  const savPicture = async () => {
+    const asset = await MediaLibrary.createAssetAsync(image);
+  }
   
   const takePicture = async () => {
     if(camera){
@@ -39,12 +50,17 @@ export default function Cam() {
     }
 
 
-      useEffect(() => {
+    useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
+        const { status } = await Camera.requestCameraPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
-  }, []);
+
+    (async () => {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+        setHasPermission(status === 'granted');
+    })();
+    }, []);
 
   if (hasPermission === null) {
     return <View />;
@@ -108,13 +124,12 @@ export default function Cam() {
         <View style={{flex:0,flexDirection:'row',justifyContent:'center'}}>
             <TouchableOpacity style={styles.button} onPress={() => {
                 setImage(null)
-                console.log(image,"d")
                 }}>
                 <Text style={styles.c}>❌</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.button} onPress={() => {
+                savPicture()
                 setImage(null)
-                console.log(image,"d")
                 }}>
                 <Text style={styles.c}>💾</Text>
             </TouchableOpacity>
